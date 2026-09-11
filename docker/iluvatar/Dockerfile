@@ -54,8 +54,10 @@ RUN apt-get update \
         ca-certificates \
         curl \
         git \
-        python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf "$(command -v python3.12)" /usr/local/bin/python \
+    && python -m pip --version
 
 RUN python -m pip install --no-cache-dir \
         "setuptools>=77.0.3,<81.0.0" \
