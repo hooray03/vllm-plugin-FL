@@ -54,6 +54,7 @@ RUN apt-get update \
         ca-certificates \
         curl \
         git \
+        python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python -m pip install --no-cache-dir \
