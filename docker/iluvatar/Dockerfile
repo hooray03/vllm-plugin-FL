@@ -68,6 +68,11 @@ RUN python -m pip install --no-cache-dir \
         cmake
 
 RUN python -m pip uninstall -y vllm || true \
+    && python -m pip cache remove vllm || true \
+    && SITE_PACKAGES="$(python -c 'import site; print(site.getsitepackages()[0])')" \
+    && find "${SITE_PACKAGES}" -maxdepth 1 \
+        \( -name "vllm" -o -name "vllm-*.dist-info" -o -name "vllm-*.egg-info" \) \
+        -exec rm -rf {} + 2>/dev/null || true \
     && rm -rf /tmp/vllm \
     && git clone --depth 1 --branch "v${VLLM_VERSION}" \
         "${VLLM_SOURCE_URL}" /tmp/vllm \
@@ -120,7 +125,13 @@ FROM dev AS ci
 
 RUN python -m pip install --no-cache-dir \
         pytest-timeout \
-        pytest-metadata
+        pytest-metadata \
+        requests \
+        openai \
+        pillow \
+        decorator \
+        pyyaml \
+        sqlalchemy
 
 WORKDIR /workspace
 
