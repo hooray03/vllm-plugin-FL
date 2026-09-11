@@ -23,6 +23,10 @@ runner_labels:
 # Keep the validated host model directory available at the paths shared by the
 # existing Qwen3.6 cases.
 container_volumes:
+  - /dev:/dev
+  - /tmp:/tmp
+  - /lib/modules:/lib/modules
+  - /sys:/sys
   - /mnt/share/user_homes/models:/data/models/Qwen
 
 container_options: >-
