@@ -55,6 +55,9 @@ bi_v150:
       exclude: []
     unit:
       include: "*"
-      exclude: []
+      # Iluvatar CoreX does not implement CUDA graph capture yet; this
+      # module raises during import rather than exposing a skippable test.
+      exclude:
+        - worker/test_model_runner.py
     benchmark:
       enabled: false
