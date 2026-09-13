@@ -110,7 +110,7 @@ RUN python -m pip uninstall -y vllm || true \
 # The documented CoreX base image does not include FlagGems. Install the
 # validated 5.0 release required by vllm_fl at runtime.
 RUN rm -rf /tmp/FlagGems \
-    && git clone --depth 1 --branch "${FLAGGEMS_VERSION}" \
+    && git clone --depth 1 --branch "v${FLAGGEMS_VERSION}" \
         https://gh-proxy.org/https://github.com/flagos-ai/FlagGems /tmp/FlagGems \
     && cd /tmp/FlagGems \
     && python -m pip install --no-build-isolation --no-deps . \
