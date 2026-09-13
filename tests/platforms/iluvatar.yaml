@@ -59,5 +59,6 @@ bi_v150:
       # module raises during import rather than exposing a skippable test.
       exclude:
         - worker/test_model_runner.py
+        - compilation/test_graph.py
     benchmark:
       enabled: false
