@@ -23,6 +23,7 @@ FROM ${ILUVATAR_BASE_IMAGE} AS base
 ARG ILUVATAR_BASE_IMAGE
 ARG VLLM_VERSION=0.24.0
 ARG TORCH_VERSION=2.10.0
+ARG FLAGGEMS_VERSION=5.0.0
 ARG VLLM_ARCHIVE_URL
 ARG DRIVER_VERSION=4.5.0
 ARG BUILD_DATE=unknown
@@ -105,6 +106,16 @@ RUN python -m pip uninstall -y vllm || true \
     && python -m pip install --no-cache-dir "numpy<2.0" \
     && cd / \
     && rm -rf /tmp/vllm /tmp/vllm.tar.gz
+
+# The documented CoreX base image does not include FlagGems. Install the
+# validated 5.0 release required by vllm_fl at runtime.
+RUN rm -rf /tmp/FlagGems \
+    && git clone --depth 1 --branch "${FLAGGEMS_VERSION}" \
+        https://gh-proxy.org/https://github.com/flagos-ai/FlagGems /tmp/FlagGems \
+    && cd /tmp/FlagGems \
+    && python -m pip install --no-build-isolation --no-deps . \
+    && cd / \
+    && rm -rf /tmp/FlagGems
 
 # Metadata-only validation avoids initializing the CoreX driver during build.
 RUN python - <<'PY'
