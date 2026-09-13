@@ -9,7 +9,10 @@ git config --global --add safe.directory "$(pwd)"
 : "${VLLM_PLUGINS:?VLLM_PLUGINS is not set}"
 : "${CUDA_VISIBLE_DEVICES:?CUDA_VISIBLE_DEVICES is not set}"
 
-VLLM_VENDOR=cuda python -m pip install --no-build-isolation --no-deps -e .
+# CoreX exposes a CUDA-compatible runtime, but its nvcc is not NVIDIA CUDA
+# and cannot be parsed by CMake's CUDA compiler detection.  Install the
+# Python package without requesting the optional native extension build.
+python -m pip install --no-build-isolation --no-deps -e .
 
 python - <<'PY'
 import flag_gems
