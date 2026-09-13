@@ -15,7 +15,7 @@
 # vLLM 0.24 image for Iluvatar BI-V150. Keep the vendor CoreX stack from the
 # validated v0.20.2 image and replace only vLLM with the official empty build.
 ARG ILUVATAR_BASE_IMAGE=registry.iluvatar.com.cn:10443/vllm_plugin/corex_vllm_plugin:0.20.2.b1c1e6ef56ec
-ARG VLLM_ARCHIVE_URL=
+ARG VLLM_ARCHIVE_URL=https://gh-proxy.com/https://github.com/vllm-project/vllm/archive/refs/tags/v0.24.0.tar.gz
 
 # ---------- base stage ----------
 FROM ${ILUVATAR_BASE_IMAGE} AS base
@@ -78,7 +78,13 @@ RUN python -m pip uninstall -y vllm || true \
         -exec rm -rf {} + 2>/dev/null || true \
     && rm -rf /tmp/vllm \
     && mkdir -p /tmp/vllm \
-    && ARCHIVE_URL="${VLLM_ARCHIVE_URL:-https://github.com/vllm-project/vllm/archive/refs/tags/v${VLLM_VERSION}.tar.gz}" \
+    && ARCHIVE_URL="${VLLM_ARCHIVE_URL:-https://gh-proxy.com/https://github.com/vllm-project/vllm/archive/refs/tags/v${VLLM_VERSION}.tar.gz}" \
+    && case "${ARCHIVE_URL}" in \
+        \[*\]\(*\)) ARCHIVE_URL="${ARCHIVE_URL#\[}"; ARCHIVE_URL="${ARCHIVE_URL%%\]*}" ;; \
+      esac \
+    && case "${ARCHIVE_URL}" in \
+        https://github.com/*) ARCHIVE_URL="https://gh-proxy.com/${ARCHIVE_URL}" ;; \
+      esac \
     && curl --http1.1 -fL \
         --retry 10 --retry-delay 5 --retry-all-errors \
         "${ARCHIVE_URL}" -o /tmp/vllm.tar.gz \
