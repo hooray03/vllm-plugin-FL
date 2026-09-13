@@ -15,7 +15,7 @@
 # vLLM 0.24 image for Iluvatar BI-V150. Keep the vendor CoreX stack from the
 # validated v0.20.2 image and replace only vLLM with the official empty build.
 ARG ILUVATAR_BASE_IMAGE=registry.iluvatar.com.cn:10443/vllm_plugin/corex_vllm_plugin:0.20.2.b1c1e6ef56ec
-ARG VLLM_SOURCE_URL=https://github.com/vllm-project/vllm.git
+ARG VLLM_ARCHIVE_URL=
 
 # ---------- base stage ----------
 FROM ${ILUVATAR_BASE_IMAGE} AS base
@@ -23,7 +23,7 @@ FROM ${ILUVATAR_BASE_IMAGE} AS base
 ARG ILUVATAR_BASE_IMAGE
 ARG VLLM_VERSION=0.24.0
 ARG TORCH_VERSION=2.10.0
-ARG VLLM_SOURCE_URL
+ARG VLLM_ARCHIVE_URL
 ARG DRIVER_VERSION=4.5.0
 ARG BUILD_DATE=unknown
 ARG VCS_REF=unknown
@@ -77,14 +77,18 @@ RUN python -m pip uninstall -y vllm || true \
         \( -name "vllm" -o -name "vllm-*.dist-info" -o -name "vllm-*.egg-info" \) \
         -exec rm -rf {} + 2>/dev/null || true \
     && rm -rf /tmp/vllm \
-    && git clone --depth 1 --branch "v${VLLM_VERSION}" \
-        "${VLLM_SOURCE_URL}" /tmp/vllm \
+    && mkdir -p /tmp/vllm \
+    && ARCHIVE_URL="${VLLM_ARCHIVE_URL:-https://github.com/vllm-project/vllm/archive/refs/tags/v${VLLM_VERSION}.tar.gz}" \
+    && curl --http1.1 -fL \
+        --retry 10 --retry-delay 5 --retry-all-errors \
+        "${ARCHIVE_URL}" -o /tmp/vllm.tar.gz \
+    && tar -xzf /tmp/vllm.tar.gz -C /tmp/vllm --strip-components=1 \
     && cd /tmp/vllm \
     && VLLM_TARGET_DEVICE=empty python -m pip install --no-cache-dir \
         --no-build-isolation --no-deps . \
     && python -m pip install --no-cache-dir "numpy<2.0" \
     && cd / \
-    && rm -rf /tmp/vllm
+    && rm -rf /tmp/vllm /tmp/vllm.tar.gz
 
 # Metadata-only validation avoids initializing the CoreX driver during build.
 RUN python - <<'PY'
