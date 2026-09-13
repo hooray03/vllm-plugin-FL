@@ -84,7 +84,8 @@ RUN python -m pip uninstall -y vllm || true \
         "${ARCHIVE_URL}" -o /tmp/vllm.tar.gz \
     && tar -xzf /tmp/vllm.tar.gz -C /tmp/vllm --strip-components=1 \
     && cd /tmp/vllm \
-    && VLLM_TARGET_DEVICE=empty python -m pip install --no-cache-dir \
+    && SETUPTOOLS_SCM_PRETEND_VERSION_FOR_VLLM="${VLLM_VERSION}" \
+        VLLM_TARGET_DEVICE=empty python -m pip install --no-cache-dir \
         --no-build-isolation --no-deps . \
     && python -m pip install --no-cache-dir "numpy<2.0" \
     && cd / \
