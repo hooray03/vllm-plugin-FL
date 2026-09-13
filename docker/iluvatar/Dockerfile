@@ -149,6 +149,7 @@ RUN python -m pip install --no-cache-dir \
         pytest==8.4.1 \
         pytest-cov \
         pytest-json-report \
+        "transformers>=5.0.0,<6.0.0" \
         ruff \
         pre-commit
 
