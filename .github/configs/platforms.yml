@@ -32,5 +32,7 @@ platforms:
     enabled: false
   enflame:
     enabled: true
+  iluvatar:
+    enabled: true
   kunlunxin:
     enabled: false
